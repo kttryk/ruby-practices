@@ -9,11 +9,11 @@ score = ARGV[0]
 scores = score.split(',')
 scores_index = 0
 point = 0
-(1..10).each do |f|
+(1..10).each do |frame_no|
   shot1 = scores[scores_index]
   shot2 = scores[scores_index + 1]
   shot3 = scores[scores_index + 2]
-  if f == 10
+  if frame_no == 10
     scores[scores_index..].each { |s| point += get_shot_score(s) }
   elsif shot1 == 'X' # strike
     point += 10
