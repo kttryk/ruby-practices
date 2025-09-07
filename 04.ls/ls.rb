@@ -4,7 +4,7 @@
 COLUMN_NUM = 3
 
 def get_max_length(array)
-  array.max_by(&:length).length
+  !array.size.zero? ? array.max_by(&:length).length : 0
 end
 
 def create_cols_array(array, column_num)
