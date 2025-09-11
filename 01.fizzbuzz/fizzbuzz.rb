@@ -3,11 +3,11 @@
 (1..20).each do |num|
   puts(
     if (num % 3).zero? && (num % 5).zero?
-      "FizzBuzz"
+      'FizzBuzz'
     elsif (num % 3).zero?
-      "Fizz"
+      'Fizz'
     elsif (num % 5).zero?
-      "Buzz"
+      'Buzz'
     else
       num
     end
