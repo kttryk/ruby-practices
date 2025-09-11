@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
-fizz = 'Fizz'
-buzz = 'Buzz'
 [*1..20].each do |num|
   if (num % 3).zero? && (num % 5).zero?
-    puts "#{fizz}#{buzz}"
+    puts "FizzBuzz"
   elsif (num % 3).zero?
-    puts fizz
+    puts "Fizz"
   elsif (num % 5).zero?
-    puts buzz
+    puts "Buzz"
   else
     puts num
   end
