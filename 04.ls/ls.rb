@@ -4,12 +4,12 @@
 COLUMN_NUM = 3
 
 def main
-  entries = get_entries()
+  entries = list_entries
   print_entries(entries)
 end
 
-def get_entries()
-  Dir.glob("*").map do |file|
+def list_entries
+  Dir.glob('*').map do |file|
     File.basename(file)
   end
 end
