@@ -5,26 +5,28 @@ def get_shot_score(shot)
   shot == 'X' ? 10 : shot.to_i
 end
 
-score = ARGV[0]
-scores = score.split(',')
-scores_index = 0
+result = ARGV[0]
+shots = result.split(',')
+scores = shots.map { get_shot_score(it) }
+
 point = 0
+frame_begin = 0
+frame_score_end = nil
+frame_shot_cnt = nil
+
 (1..10).each do |frame_no|
-  shot1 = scores[scores_index]
-  shot2 = scores[scores_index + 1]
-  shot3 = scores[scores_index + 2]
   if frame_no == 10
-    scores[scores_index..].each { |s| point += get_shot_score(s) }
-  elsif shot1 == 'X' # strike
-    point += 10
-    point += get_shot_score(shot2)
-    point += get_shot_score(shot3)
-    scores_index += 1
+    frame_score_end = scores.length - 1
+  elsif shots[frame_begin] == 'X' # strike
+    frame_shot_cnt = 1
+    frame_score_end = frame_begin + 2
   else
-    frame_score = get_shot_score(shot1) + get_shot_score(shot2)
-    point += frame_score
-    point += get_shot_score(shot3) if frame_score == 10 # spare
-    scores_index += 2
+    frame_shot_cnt = 2
+    frame_score_end = frame_begin + 1
+    frame_score_end += 1 if scores[frame_begin..frame_begin + 1].sum == 10
   end
+  point += scores[frame_begin..frame_score_end].sum
+  frame_begin += frame_shot_cnt
 end
+
 puts point
