@@ -28,11 +28,9 @@ end
 
 def create_table(array)
   row_num = (array.size + COLUMN_NUM - 1) / COLUMN_NUM
-  cols = Array.new(COLUMN_NUM)
-  (0..COLUMN_NUM - 1).each do |col_index|
-    cols[col_index] = array.slice(row_num * col_index, row_num) || []
+  Array.new(COLUMN_NUM) do |col_index|
+    array.slice(row_num * col_index, row_num) || []
   end
-  cols
 end
 
 def get_max_length(array)
