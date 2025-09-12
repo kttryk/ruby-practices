@@ -3,6 +3,12 @@
 
 COLUMN_NUM = 3
 
+def main
+  pwd_path = Dir.pwd
+  array = get_directory_data(pwd_path)
+  print_array_column(array, COLUMN_NUM)
+end
+
 def get_max_length(array)
   !array.empty? ? array.max_by(&:length).length : 0
 end
@@ -34,6 +40,4 @@ def get_directory_data(path)
   end
 end
 
-pwd_path = Dir.pwd
-array = get_directory_data(pwd_path)
-print_array_column(array, COLUMN_NUM)
+main
