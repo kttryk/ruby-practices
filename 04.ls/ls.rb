@@ -4,13 +4,12 @@
 COLUMN_NUM = 3
 
 def main
-  pwd_path = Dir.pwd
-  array = get_directory_data(pwd_path)
+  array = get_directory_data()
   print_array_column(array)
 end
 
-def get_directory_data(path)
-  Dir.glob("#{path}/*").map do |file|
+def get_directory_data()
+  Dir.glob("*").map do |file|
     File.basename(file)
   end
 end
