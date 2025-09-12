@@ -36,7 +36,7 @@ def create_table(array)
 end
 
 def get_max_length(array)
-  !array.empty? ? array.max_by(&:length).length : 0
+  array.max_by(&:length)&.length || 0
 end
 
 main
