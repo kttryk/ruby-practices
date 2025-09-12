@@ -6,7 +6,7 @@ COLUMN_NUM = 3
 def main
   pwd_path = Dir.pwd
   array = get_directory_data(pwd_path)
-  print_array_column(array, COLUMN_NUM)
+  print_array_column(array)
 end
 
 def get_directory_data(path)
@@ -15,8 +15,8 @@ def get_directory_data(path)
   end
 end
 
-def print_array_column(array, column_num)
-  cols = create_cols_array(array, column_num)
+def print_array_column(array)
+  cols = create_cols_array(array)
   cols_width = cols.map { |col| get_max_length(col) }
 
   cols[0].each_index do |row_index|
@@ -27,10 +27,10 @@ def print_array_column(array, column_num)
   end
 end
 
-def create_cols_array(array, column_num)
-  row_num = (array.size + column_num - 1) / column_num
-  cols = Array.new(column_num)
-  (0..column_num - 1).each do |col_index|
+def create_cols_array(array)
+  row_num = (array.size + COLUMN_NUM - 1) / COLUMN_NUM
+  cols = Array.new(COLUMN_NUM)
+  (0..COLUMN_NUM - 1).each do |col_index|
     cols[col_index] = array.slice(row_num * col_index, row_num) || []
   end
   cols
