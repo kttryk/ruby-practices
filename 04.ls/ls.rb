@@ -4,29 +4,29 @@
 COLUMN_NUM = 3
 
 def main
-  array = get_directory_data()
-  print_array_column(array)
+  entries = get_entries()
+  print_entries(entries)
 end
 
-def get_directory_data()
+def get_entries()
   Dir.glob("*").map do |file|
     File.basename(file)
   end
 end
 
-def print_array_column(array)
-  cols = create_cols_array(array)
-  cols_width = cols.map { |col| get_max_length(col) }
+def print_entries(entries)
+  entries_table = create_table(entries)
+  col_widths = entries_table.map { |col| get_max_length(col) }
 
-  cols[0].each_index do |row_index|
-    cols.each_index do |col_index|
-      printf("%-#{cols_width[col_index]}s\t", cols[col_index][row_index])
+  entries_table[0].each_index do |row_index|
+    entries_table.each_index do |col_index|
+      printf("%-#{col_widths[col_index]}s\t", entries_table[col_index][row_index])
     end
     puts
   end
 end
 
-def create_cols_array(array)
+def create_table(array)
   row_num = (array.size + COLUMN_NUM - 1) / COLUMN_NUM
   cols = Array.new(COLUMN_NUM)
   (0..COLUMN_NUM - 1).each do |col_index|
