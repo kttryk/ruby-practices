@@ -9,17 +9,10 @@ def main
   print_array_column(array, COLUMN_NUM)
 end
 
-def get_max_length(array)
-  !array.empty? ? array.max_by(&:length).length : 0
-end
-
-def create_cols_array(array, column_num)
-  row_num = (array.size + column_num - 1) / column_num
-  cols = Array.new(column_num)
-  (0..column_num - 1).each do |col_index|
-    cols[col_index] = array.slice(row_num * col_index, row_num) || []
+def get_directory_data(path)
+  Dir.glob("#{path}/*").map do |file|
+    File.basename(file)
   end
-  cols
 end
 
 def print_array_column(array, column_num)
@@ -34,10 +27,17 @@ def print_array_column(array, column_num)
   end
 end
 
-def get_directory_data(path)
-  Dir.glob("#{path}/*").map do |file|
-    File.basename(file)
+def create_cols_array(array, column_num)
+  row_num = (array.size + column_num - 1) / column_num
+  cols = Array.new(column_num)
+  (0..column_num - 1).each do |col_index|
+    cols[col_index] = array.slice(row_num * col_index, row_num) || []
   end
+  cols
+end
+
+def get_max_length(array)
+  !array.empty? ? array.max_by(&:length).length : 0
 end
 
 main
