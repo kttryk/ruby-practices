@@ -17,11 +17,12 @@ end
 def print_entries(entries)
   row_num = (entries.size + COLUMN_NUM - 1) / COLUMN_NUM
   entries_table = create_table(entries, row_num)
-  col_widths = get_col_widths(entries, row_num)
+  max_tab_num = get_tab_num(entries.max_by(&:length)) + 1
 
   entries_table.each do |row_entries|
-    row_entries.each_index do |col_index|
-      printf("%-#{col_widths[col_index]}s		", row_entries[col_index])
+    row_entries.each do |entry|
+      delimiter = "\t" * (max_tab_num - get_tab_num(entry))
+      printf("%s#{delimiter}", entry)
     end
     puts
   end
@@ -33,10 +34,8 @@ def create_table(entries, row_num)
   end
 end
 
-def get_col_widths(entries, row_num)
-  Array.new(COLUMN_NUM) do |col_index|
-    entries.slice(row_num * col_index, row_num).max_by(&:length)&.length
-  end
+def get_tab_num(entry)
+  (entry&.length || 0) / 8
 end
 
 main
