@@ -15,8 +15,7 @@ def list_entries
 end
 
 def print_entries(entries)
-  row_num = (entries.size + COLUMN_NUM - 1) / COLUMN_NUM
-  entries_table = create_table(entries, row_num)
+  entries_table = create_table(entries)
   max_tab_num = get_tab_num(entries.max_by(&:length)) + 1
 
   entries_table.each do |row_entries|
@@ -28,7 +27,8 @@ def print_entries(entries)
   end
 end
 
-def create_table(entries, row_num)
+def create_table(entries)
+  row_num = (entries.size + COLUMN_NUM - 1) / COLUMN_NUM
   Array.new(row_num) do |row_index|
     Array.new(COLUMN_NUM) { |col_index| entries[col_index * row_num + row_index] || '' }
   end
