@@ -21,7 +21,7 @@ def print_entries(entries)
 
   entries_table.each do |row_entries|
     row_entries.each_index do |col_index|
-      printf("%-#{col_widths[col_index]}s\t", row_entries[col_index])
+      printf("%-#{col_widths[col_index]}s		", row_entries[col_index])
     end
     puts
   end
