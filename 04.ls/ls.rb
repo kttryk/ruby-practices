@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 COLUMN_COUNT = 3
+TAB_WIDTH = 8
 
 def main
   entries = list_entries
@@ -35,7 +36,7 @@ def create_table(entries)
 end
 
 def calc_tab_num(entry)
-  entry.length / 8
+  entry.length / TAB_WIDTH
 end
 
 main
