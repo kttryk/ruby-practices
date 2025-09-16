@@ -17,11 +17,11 @@ end
 
 def print_entries(entries)
   entries_table = create_table(entries)
-  max_tab_num = calc_tab_num(entries.max_by(&:length)) + 1
+  max_tab_num = calc_tab_cnt(entries.max_by(&:length)) + 1
 
   entries_table.each do |row_entries|
     row_entries.each do |entry|
-      delimiter = "\t" * (max_tab_num - calc_tab_num(entry))
+      delimiter = "\t" * (max_tab_num - calc_tab_cnt(entry))
       print "#{entry}#{delimiter}"
     end
     puts
@@ -35,7 +35,7 @@ def create_table(entries)
   end
 end
 
-def calc_tab_num(entry)
+def calc_tab_cnt(entry)
   entry.length / TAB_WIDTH
 end
 
