@@ -35,7 +35,7 @@ def create_table(entries)
 end
 
 def calc_tab_num(entry)
-  (entry&.length || 0) / 8
+  entry.length / 8
 end
 
 main
