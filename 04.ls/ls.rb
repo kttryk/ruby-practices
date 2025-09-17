@@ -1,18 +1,28 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'optparse'
+
 COLUMN_COUNT = 3
 TAB_WIDTH = 8
 
 def main
-  entries = list_entries
+  options = parse_options
+  entries = list_entries(options)
   print_entries(entries)
 end
 
-def list_entries
-  Dir.glob('*').map do |file|
-    File.basename(file)
+def parse_options
+  options = {}
+  OptionParser.new do |opt|
+    opt.on('-a') { options[:a] = true }
+    opt.parse!(ARGV)
   end
+  options
+end
+
+def list_entries(options)
+  options[:a] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
 end
 
 def print_entries(entries)
