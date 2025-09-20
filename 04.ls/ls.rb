@@ -16,13 +16,15 @@ def parse_options
   options = {}
   OptionParser.new do |opt|
     opt.on('-a') { options[:a] = true }
+    opt.on('-r') { options[:r] = true }
     opt.parse!(ARGV)
   end
   options
 end
 
 def list_entries(options)
-  options[:a] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
+  entries = options[:a] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
+  options[:r] ? entries.reverse : entries
 end
 
 def print_entries(entries)
