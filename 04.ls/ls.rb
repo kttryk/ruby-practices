@@ -99,18 +99,11 @@ def get_entry_mode(stat)
   mode = format('%06o', stat.mode)
   mode_string = { '10' => '-', '04' => 'd', '12' => 'l' }[mode.slice(MODE_FILE_TYPE_BEGIN, MODE_FILE_TYPE_LENGTH)]
   mode.slice(MODE_PERMISSION_BEGIN, MODE_PERMISSION_LENGTH).each_char do |permission|
-    mode_string += create_permission_string(permission.to_i)
+    format('%03b', permission.to_i).each_char.with_index do |bit, index|
+      mode_string += bit == '1' ? %w[r w x][index] : '-'
+    end
   end
   mode_string
-end
-
-def create_permission_string(permission)
-  permission_binary = format('%03b', permission)
-  permission_string = ''
-  permission_binary.each_char.with_index do |bit, index|
-    permission_string += { '0' => '-', '1' => %w[r w x][index] }[bit]
-  end
-  permission_string
 end
 
 def format_width(entries, key)
