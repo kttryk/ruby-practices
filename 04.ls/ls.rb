@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'etc'
 
 COLUMN_COUNT = 3
 TAB_WIDTH = 8
@@ -9,7 +10,7 @@ TAB_WIDTH = 8
 def main
   options = parse_options
   entries = list_entries(options)
-  print_entries(entries)
+  options[:l] ? print_entries_l(entries) : print_entries(entries)
 end
 
 def parse_options
@@ -17,6 +18,7 @@ def parse_options
   OptionParser.new do |opt|
     opt.on('-a') { options[:a] = true }
     opt.on('-r') { options[:r] = true }
+    opt.on('-l') { options[:l] = true }
     opt.parse!(ARGV)
   end
   options
@@ -49,6 +51,61 @@ end
 
 def calc_tab_count(entry)
   entry.length / TAB_WIDTH
+end
+
+def print_entries_l(entries)
+  puts "total #{entries.sum { |entry| File.stat(entry).blocks }}"
+  return if entries.empty?
+
+  entries.map! do |entry|
+    extract_entry_metadata(entry)
+  end
+  (1..4).each { |col_index| format_col(entries, col_index) }
+  entries.each { |entry| puts entry.join(' ') }
+end
+
+def extract_entry_metadata(entry)
+  stat = File.stat(entry)
+  time = stat.ctime
+  metadata = []
+  metadata.push(get_entry_mode(stat))
+  metadata.push(stat.nlink)
+  metadata.push(Etc.getpwuid(stat.uid).name)
+  metadata.push(Etc.getgrgid(stat.gid).name)
+  metadata.push(stat.size)
+  metadata.push(format('%2d', time.month))
+  metadata.push(format('%2d', time.day))
+  metadata.push(format('%<hour>02d:%<min>02d', hour: time.hour, min: time.min))
+  metadata.push(entry)
+  metadata
+end
+
+def get_entry_mode(stat)
+  mode = format('%06o', stat.mode)
+  mode_string = { '10' => '-', '04' => 'd', '12' => 'l' }[mode.slice(0, 2)]
+  (3..5).each do |i|
+    mode_string += create_permission_string(mode.slice(i).to_i)
+  end
+  mode_string
+end
+
+def create_permission_string(permission)
+  permission_binary = format('%03b', permission)
+  permission_string = ''
+  (0..2).each do |i|
+    permission_string += { '0' => '-', '1' => %w[r w x][i] }[permission_binary.slice(i)]
+  end
+  permission_string
+end
+
+def format_col(entries, col_index)
+  max_length = entries.map { |entry| entry[col_index].to_s.length }.max.to_i
+  if entries[0][col_index].is_a?(String)
+    entries.each { |entry| entry[col_index] += ' ' * (max_length - entry[col_index].length + 1) }
+  else
+    entries.each { |entry| entry[col_index] = format("%#{max_length}d", entry[col_index]) }
+  end
+  entries
 end
 
 main
