@@ -6,6 +6,10 @@ require 'etc'
 
 COLUMN_COUNT = 3
 TAB_WIDTH = 8
+MODE_FILE_TYPE_BEGIN = 0
+MODE_FILE_TYPE_LENGTH = 2
+MODE_PERMISSION_BEGIN = 2
+MODE_PERMISSION_LENGTH = 3
 
 def main
   options = parse_options
@@ -93,8 +97,8 @@ end
 
 def get_entry_mode(stat)
   mode = format('%06o', stat.mode)
-  mode_string = { '10' => '-', '04' => 'd', '12' => 'l' }[mode.slice(0, 2)]
-  (3..5).each do |i|
+  mode_string = { '10' => '-', '04' => 'd', '12' => 'l' }[mode.slice(MODE_FILE_TYPE_BEGIN, MODE_FILE_TYPE_LENGTH)]
+  (MODE_PERMISSION_BEGIN..MODE_PERMISSION_BEGIN + MODE_PERMISSION_LENGTH).each do |i|
     mode_string += create_permission_string(mode.slice(i).to_i)
   end
   mode_string
