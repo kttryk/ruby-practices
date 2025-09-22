@@ -60,23 +60,34 @@ def print_entries_l(entries)
   entries.map! do |entry|
     extract_entry_metadata(entry)
   end
-  (1..4).each { |col_index| format_col(entries, col_index) }
-  entries.each { |entry| puts entry.join(' ') }
+  %i[nlink user group size].each { |format_key| format_width(entries, format_key) }
+  entries.each do |metadata|
+    print "#{metadata[:mode]} "
+    print "#{metadata[:nlink]} "
+    print "#{metadata[:user]} "
+    print "#{metadata[:group]} "
+    print "#{metadata[:size]} "
+    print "#{metadata[:month]} "
+    print "#{metadata[:day]} "
+    print "#{metadata[:time]} "
+    print metadata[:file]
+    puts
+  end
 end
 
 def extract_entry_metadata(entry)
   stat = File.stat(entry)
   time = stat.ctime
-  metadata = []
-  metadata.push(get_entry_mode(stat))
-  metadata.push(stat.nlink)
-  metadata.push(Etc.getpwuid(stat.uid).name)
-  metadata.push(Etc.getgrgid(stat.gid).name)
-  metadata.push(stat.size)
-  metadata.push(format('%2d', time.month))
-  metadata.push(format('%2d', time.day))
-  metadata.push(format('%<hour>02d:%<min>02d', hour: time.hour, min: time.min))
-  metadata.push(entry)
+  metadata = {}
+  metadata[:mode]  = get_entry_mode(stat)
+  metadata[:nlink] = stat.nlink
+  metadata[:user]  = Etc.getpwuid(stat.uid).name
+  metadata[:group] = Etc.getgrgid(stat.gid).name
+  metadata[:size]  = stat.size
+  metadata[:month] = format('%2d', time.month)
+  metadata[:day]   = format('%2d', time.day)
+  metadata[:time]  = format('%<hour>02d:%<min>02d', hour: time.hour, min: time.min)
+  metadata[:file]  = entry
   metadata
 end
 
@@ -98,12 +109,12 @@ def create_permission_string(permission)
   permission_string
 end
 
-def format_col(entries, col_index)
-  max_length = entries.map { |entry| entry[col_index].to_s.length }.max.to_i
-  if entries[0][col_index].is_a?(String)
-    entries.each { |entry| entry[col_index] += ' ' * (max_length - entry[col_index].length + 1) }
+def format_width(entries, key)
+  max_length = entries.map { |entry| entry[key].to_s.length }.max.to_i
+  if entries[0][key].is_a?(String)
+    entries.each { |entry| entry[key] += ' ' * (max_length - entry[key].length + 1) }
   else
-    entries.each { |entry| entry[col_index] = format("%#{max_length}d", entry[col_index]) }
+    entries.each { |entry| entry[key] = format("%#{max_length}d", entry[key]) }
   end
   entries
 end
