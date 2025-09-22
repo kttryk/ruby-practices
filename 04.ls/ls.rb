@@ -8,7 +8,7 @@ COLUMN_COUNT = 3
 TAB_WIDTH = 8
 MODE_FILE_TYPE_BEGIN = 0
 MODE_FILE_TYPE_LENGTH = 2
-MODE_PERMISSION_BEGIN = 2
+MODE_PERMISSION_BEGIN = 3
 MODE_PERMISSION_LENGTH = 3
 
 def main
@@ -98,10 +98,12 @@ end
 def get_entry_mode(stat)
   mode = format('%06o', stat.mode)
   mode_string = { '10' => '-', '04' => 'd', '12' => 'l' }[mode.slice(MODE_FILE_TYPE_BEGIN, MODE_FILE_TYPE_LENGTH)]
-  mode.slice(MODE_PERMISSION_BEGIN, MODE_PERMISSION_LENGTH).each_char do |permission|
-    format('%03b', permission.to_i).each_char.with_index do |bit, index|
-      mode_string += bit == '1' ? %w[r w x][index] : '-'
-    end
+  mode.slice(MODE_PERMISSION_BEGIN, MODE_PERMISSION_LENGTH).chars.map(&:to_i).each do |digit|
+    mode_string += [
+      (digit & 4).zero? ? '-' : 'r',
+      (digit & 2).zero? ? '-' : 'w',
+      (digit & 1).zero? ? '-' : 'x'
+    ].join
   end
   mode_string
 end
