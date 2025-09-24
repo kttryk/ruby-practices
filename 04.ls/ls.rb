@@ -6,10 +6,13 @@ require 'etc'
 
 COLUMN_COUNT = 3
 TAB_WIDTH = 8
-MODE_FILE_TYPE_BEGIN = 0
-MODE_FILE_TYPE_LENGTH = 2
-MODE_PERMISSION_BEGIN = 3
-MODE_PERMISSION_LENGTH = 3
+MODE_FILE_TYPE_RANGE = (0..1)
+MODE_PERMISSION_RANGE = (3..5)
+FILE_TYPES = {
+  '10' => '-',
+  '04' => 'd',
+  '12' => 'l'
+}.freeze
 
 def main
   options = parse_options
@@ -83,15 +86,15 @@ end
 
 def get_entry_mode(stat)
   mode = format('%06o', stat.mode)
-  mode_string = { '10' => '-', '04' => 'd', '12' => 'l' }[mode.slice(MODE_FILE_TYPE_BEGIN, MODE_FILE_TYPE_LENGTH)]
-  mode.slice(MODE_PERMISSION_BEGIN, MODE_PERMISSION_LENGTH).chars.map(&:to_i).each do |digit|
-    mode_string += [
+  file_type = FILE_TYPES[mode[MODE_FILE_TYPE_RANGE]]
+  permission = mode[MODE_PERMISSION_RANGE].chars.map(&:to_i).map do |digit|
+    [
       (digit & 4).zero? ? '-' : 'r',
       (digit & 2).zero? ? '-' : 'w',
       (digit & 1).zero? ? '-' : 'x'
     ].join
-  end
-  mode_string
+  end.join
+  [file_type, permission].join
 end
 
 def format_metadatas(metadatas, format_keys)
