@@ -61,11 +61,9 @@ def print_entries_l(entries)
   puts "total #{entries.sum { |entry| File.stat(entry).blocks }}"
   return if entries.empty?
 
-  entries.map! do |entry|
-    extract_entry_metadata(entry)
-  end
-  formated_entries = format_entries(entries, %i[nlink user group size])
-  formated_entries.each do |metadata|
+  metadatas = entries.map { |entry| extract_entry_metadata(entry) }
+  formated_metadatas = format_metadatas(metadatas, %i[nlink user group size])
+  formated_metadatas.each do |metadata|
     puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
   end
 end
@@ -97,10 +95,10 @@ def get_entry_mode(stat)
   mode_string
 end
 
-def format_entries(entries, format_keys)
-  max_lengths = format_keys.map { |key| [key, entries.map { |entry| entry[key].to_s.length }.max.to_i] }.to_h
-  entries.map do |entry|
-    entry.map do |key, value|
+def format_metadatas(metadatas, format_keys)
+  max_lengths = format_keys.map { |key| [key, metadatas.map { |metadata| metadata[key].to_s.length }.max.to_i] }.to_h
+  metadatas.map do |metadata|
+    metadata.map do |key, value|
       max_length = max_lengths[key] || 0
       width_format = value.is_a?(String) ? "%-#{max_length + 1}s" : "%#{max_length}d"
       [key, format(width_format, value)]
