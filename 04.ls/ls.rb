@@ -66,29 +66,22 @@ def print_entries_l(entries)
   end
   %i[nlink user group size].each { |format_key| format_width(entries, format_key) }
   entries.each do |metadata|
-    print "#{metadata[:mode]} "
-    print "#{metadata[:nlink]} "
-    print "#{metadata[:user]} "
-    print "#{metadata[:group]} "
-    print "#{metadata[:size]} "
-    print "#{metadata[:datetime]} "
-    print metadata[:file]
-    puts
+    puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
   end
 end
 
 def extract_entry_metadata(entry)
   stat = File.stat(entry)
   time = stat.ctime
-  metadata = {}
-  metadata[:mode]     = get_entry_mode(stat)
-  metadata[:nlink]    = stat.nlink
-  metadata[:user]     = Etc.getpwuid(stat.uid).name
-  metadata[:group]    = Etc.getgrgid(stat.gid).name
-  metadata[:size]     = stat.size
-  metadata[:datetime] = time.strftime('%_m %_d %H:%M')
-  metadata[:file]     = entry
-  metadata
+  {
+    mode: get_entry_mode(stat),
+    nlink: stat.nlink,
+    user: Etc.getpwuid(stat.uid).name,
+    group: Etc.getgrgid(stat.gid).name,
+    size: stat.size,
+    datetime: time.strftime('%_m %_d %H:%M'),
+    file: entry
+  }
 end
 
 def get_entry_mode(stat)
