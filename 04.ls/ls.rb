@@ -64,8 +64,8 @@ def print_entries_l(entries)
   entries.map! do |entry|
     extract_entry_metadata(entry)
   end
-  %i[nlink user group size].each { |format_key| format_width(entries, format_key) }
-  entries.each do |metadata|
+  formated_entries = format_entries(entries, %i[nlink user group size])
+  formated_entries.each do |metadata|
     puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
   end
 end
@@ -97,14 +97,15 @@ def get_entry_mode(stat)
   mode_string
 end
 
-def format_width(entries, key)
-  max_length = entries.map { |entry| entry[key].to_s.length }.max.to_i
-  if entries[0][key].is_a?(String)
-    entries.each { |entry| entry[key] += ' ' * (max_length - entry[key].length + 1) }
-  else
-    entries.each { |entry| entry[key] = format("%#{max_length}d", entry[key]) }
+def format_entries(entries, format_keys)
+  max_lengths = format_keys.map { |key| [key, entries.map { |entry| entry[key].to_s.length }.max.to_i] }.to_h
+  entries.map do |entry|
+    entry.map do |key, value|
+      max_length = max_lengths[key] || 0
+      width_format = value.is_a?(String) ? "%-#{max_length + 1}s" : "%#{max_length}d"
+      [key, format(width_format, value)]
+    end.to_h
   end
-  entries
 end
 
 main
