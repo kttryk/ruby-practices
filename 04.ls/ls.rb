@@ -71,9 +71,7 @@ def print_entries_l(entries)
     print "#{metadata[:user]} "
     print "#{metadata[:group]} "
     print "#{metadata[:size]} "
-    print "#{metadata[:month]} "
-    print "#{metadata[:day]} "
-    print "#{metadata[:time]} "
+    print "#{metadata[:datetime]} "
     print metadata[:file]
     puts
   end
@@ -83,15 +81,13 @@ def extract_entry_metadata(entry)
   stat = File.stat(entry)
   time = stat.ctime
   metadata = {}
-  metadata[:mode]  = get_entry_mode(stat)
-  metadata[:nlink] = stat.nlink
-  metadata[:user]  = Etc.getpwuid(stat.uid).name
-  metadata[:group] = Etc.getgrgid(stat.gid).name
-  metadata[:size]  = stat.size
-  metadata[:month] = format('%2d', time.month)
-  metadata[:day]   = format('%2d', time.day)
-  metadata[:time]  = format('%<hour>02d:%<min>02d', hour: time.hour, min: time.min)
-  metadata[:file]  = entry
+  metadata[:mode]     = get_entry_mode(stat)
+  metadata[:nlink]    = stat.nlink
+  metadata[:user]     = Etc.getpwuid(stat.uid).name
+  metadata[:group]    = Etc.getgrgid(stat.gid).name
+  metadata[:size]     = stat.size
+  metadata[:datetime] = time.strftime('%_m %_d %H:%M')
+  metadata[:file]     = entry
   metadata
 end
 
