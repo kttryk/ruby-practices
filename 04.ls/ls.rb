@@ -59,7 +59,6 @@ end
 
 def print_entries_l(entries)
   puts "total #{entries.sum { |entry| File.stat(entry).blocks }}"
-  return if entries.empty?
 
   metadatas = entries.map { |entry| extract_entry_metadata(entry) }
   formated_metadatas = format_metadatas(metadatas, %i[nlink user group size])
