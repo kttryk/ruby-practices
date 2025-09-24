@@ -61,10 +61,9 @@ def calc_tab_count(entry)
 end
 
 def print_entries_l(entries)
-  puts "total #{entries.sum { |entry| File.stat(entry).blocks }}"
-
   metadatas = entries.map { |entry| extract_entry_metadata(entry) }
   formated_metadatas = format_metadatas(metadatas, %i[nlink user group size])
+  puts "total #{metadatas.sum { |metadata| metadata[:blocks] }}"
   formated_metadatas.each do |metadata|
     puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
   end
@@ -80,7 +79,8 @@ def extract_entry_metadata(entry)
     group: Etc.getgrgid(stat.gid).name,
     size: stat.size,
     datetime: time.strftime('%_m %_d %H:%M'),
-    file: entry
+    file: entry,
+    blocks: stat.blocks
   }
 end
 
