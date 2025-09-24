@@ -98,7 +98,7 @@ def get_entry_mode(stat)
 end
 
 def format_metadatas(metadatas, format_keys)
-  max_lengths = format_keys.map { |key| [key, metadatas.map { |metadata| metadata[key].to_s.length }.max.to_i] }.to_h
+  max_lengths = format_keys.map { |key| [key, metadatas.map { |metadata| metadata[key].to_s.length }.max] }.to_h
   metadatas.map do |metadata|
     metadata.map do |key, value|
       max_length = max_lengths[key] || 0
