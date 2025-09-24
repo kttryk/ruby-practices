@@ -71,7 +71,7 @@ end
 
 def extract_entry_metadata(entry)
   stat = File.stat(entry)
-  time = stat.ctime
+  time = stat.mtime
   {
     mode: get_entry_mode(stat),
     nlink: stat.nlink,
