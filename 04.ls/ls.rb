@@ -87,18 +87,22 @@ end
 def get_entry_mode(stat)
   mode = format('%06o', stat.mode)
   file_type = FILE_TYPES[mode[MODE_FILE_TYPE_RANGE]]
-  permission = mode[MODE_PERMISSION_RANGE].chars.map(&:to_i).map do |digit|
+  permission = mode[MODE_PERMISSION_RANGE].chars.map do |char|
+    digit = char.to_i
     [
       (digit & 4).zero? ? '-' : 'r',
       (digit & 2).zero? ? '-' : 'w',
       (digit & 1).zero? ? '-' : 'x'
-    ].join
-  end.join
+    ]
+  end
   [file_type, permission].join
 end
 
 def format_metadatas(metadatas, format_keys)
-  max_lengths = format_keys.map { |key| [key, metadatas.map { |metadata| metadata[key].to_s.length }.max] }.to_h
+  max_lengths = format_keys.to_h do |key|
+    max_length = metadatas.map { |metadata| metadata[key].to_s.length }.max
+    [key, max_length]
+  end
   metadatas.map do |metadata|
     metadata.map do |key, value|
       max_length = max_lengths[key] || 0
