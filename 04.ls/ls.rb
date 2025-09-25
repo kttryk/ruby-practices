@@ -61,10 +61,10 @@ def calc_tab_count(entry)
 end
 
 def print_entries_l(entries)
-  metadatas = entries.map { |entry| extract_entry_metadata(entry) }
-  formated_metadatas = format_metadatas(metadatas, %i[nlink user group size])
-  puts "total #{metadatas.sum { |metadata| metadata[:blocks] }}"
-  formated_metadatas.each do |metadata|
+  entries_metadata = entries.map { |entry| extract_entry_metadata(entry) }
+  formated_entries_metadata = format_entries_metadata(entries_metadata, %i[nlink user group size])
+  puts "total #{entries_metadata.sum { |metadata| metadata[:blocks] }}"
+  formated_entries_metadata.each do |metadata|
     puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
   end
 end
@@ -98,12 +98,12 @@ def get_entry_mode(stat)
   [file_type, permission].join
 end
 
-def format_metadatas(metadatas, format_keys)
+def format_entries_metadata(entries_metadata, format_keys)
   max_lengths = format_keys.to_h do |key|
-    max_length = metadatas.map { |metadata| metadata[key].to_s.length }.max
+    max_length = entries_metadata.map { |metadata| metadata[key].to_s.length }.max
     [key, max_length]
   end
-  metadatas.map do |metadata|
+  entries_metadata.map do |metadata|
     metadata.map do |key, value|
       max_length = max_lengths[key] || 0
       width_format = value.is_a?(String) ? "%-#{max_length + 1}s" : "%#{max_length}d"
