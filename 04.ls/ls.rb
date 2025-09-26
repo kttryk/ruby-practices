@@ -2,14 +2,22 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'etc'
 
 COLUMN_COUNT = 3
 TAB_WIDTH = 8
+MODE_FILE_TYPE_RANGE = (0..1)
+MODE_PERMISSION_RANGE = (3..5)
+FILE_TYPES = {
+  '10' => '-',
+  '04' => 'd',
+  '12' => 'l'
+}.freeze
 
 def main
   options = parse_options
   entries = list_entries(options)
-  print_entries(entries)
+  options[:l] ? print_entries_l(entries) : print_entries(entries)
 end
 
 def parse_options
@@ -17,6 +25,7 @@ def parse_options
   OptionParser.new do |opt|
     opt.on('-a') { options[:a] = true }
     opt.on('-r') { options[:r] = true }
+    opt.on('-l') { options[:l] = true }
     opt.parse!(ARGV)
   end
   options
@@ -49,6 +58,58 @@ end
 
 def calc_tab_count(entry)
   entry.length / TAB_WIDTH
+end
+
+def print_entries_l(entries)
+  entries_metadata = entries.map { |entry| extract_entry_metadata(entry) }
+  formated_entries_metadata = format_entries_metadata(entries_metadata, %i[nlink user group size])
+  puts "total #{entries_metadata.sum { |metadata| metadata[:blocks] }}"
+  formated_entries_metadata.each do |metadata|
+    puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
+  end
+end
+
+def extract_entry_metadata(entry)
+  stat = File.stat(entry)
+  time = stat.mtime
+  {
+    mode: get_entry_mode(stat),
+    nlink: stat.nlink,
+    user: Etc.getpwuid(stat.uid).name,
+    group: Etc.getgrgid(stat.gid).name,
+    size: stat.size,
+    datetime: time.strftime('%_m %_d %H:%M'),
+    file: entry,
+    blocks: stat.blocks
+  }
+end
+
+def get_entry_mode(stat)
+  mode = format('%06o', stat.mode)
+  file_type = FILE_TYPES[mode[MODE_FILE_TYPE_RANGE]]
+  permission = mode[MODE_PERMISSION_RANGE].chars.map do |char|
+    digit = char.to_i
+    [
+      (digit & 4).zero? ? '-' : 'r',
+      (digit & 2).zero? ? '-' : 'w',
+      (digit & 1).zero? ? '-' : 'x'
+    ]
+  end
+  [file_type, permission].join
+end
+
+def format_entries_metadata(entries_metadata, format_keys)
+  max_lengths = format_keys.to_h do |key|
+    max_length = entries_metadata.map { |metadata| metadata[key].to_s.length }.max
+    [key, max_length]
+  end
+  entries_metadata.map do |metadata|
+    metadata.map do |key, value|
+      max_length = max_lengths[key] || 0
+      width_format = value.is_a?(String) ? "%-#{max_length + 1}s" : "%#{max_length}d"
+      [key, format(width_format, value)]
+    end.to_h
+  end
 end
 
 main
