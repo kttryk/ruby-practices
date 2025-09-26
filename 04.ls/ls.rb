@@ -104,11 +104,11 @@ def format_metadata_list(metadata_list, format_keys)
     [key, max_length]
   end
   metadata_list.map do |metadata|
-    metadata.map do |key, value|
+    metadata.to_h do |key, value|
       max_length = max_lengths[key] || 0
       width_format = value.is_a?(String) ? "%-#{max_length + 1}s" : "%#{max_length}d"
       [key, format(width_format, value)]
-    end.to_h
+    end
   end
 end
 
