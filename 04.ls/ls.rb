@@ -62,7 +62,7 @@ end
 
 def print_entries_l(entries)
   metadata_list = entries.map { |entry| extract_entry_metadata(entry) }
-  formated_metadata_list = format_metadata_list(metadata_list, %i[nlink user group size])
+  formated_metadata_list = format_metadata_list(metadata_list)
   puts "total #{metadata_list.sum { |metadata| metadata[:blocks] }}"
   formated_metadata_list.each do |metadata|
     puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
@@ -98,8 +98,8 @@ def get_entry_mode(stat)
   [file_type, permission].join
 end
 
-def format_metadata_list(metadata_list, format_keys)
-  max_lengths = format_keys.to_h do |key|
+def format_metadata_list(metadata_list)
+  max_lengths = %i[nlink user group size].to_h do |key|
     max_length = metadata_list.map { |metadata| metadata[key].to_s.length }.max
     [key, max_length]
   end
