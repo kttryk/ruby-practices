@@ -62,8 +62,8 @@ end
 
 def print_entries_l(entries)
   metadata_list = entries.map { |entry| extract_entry_metadata(entry) }
-  formatted_metadata_list = format_metadata_list(metadata_list)
   puts "total #{metadata_list.sum { |metadata| metadata[:blocks] }}"
+  formatted_metadata_list = format_metadata_list(metadata_list)
   formatted_metadata_list.each do |metadata|
     puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
   end
@@ -71,14 +71,13 @@ end
 
 def extract_entry_metadata(entry)
   stat = File.stat(entry)
-  time = stat.mtime
   {
     mode: get_entry_mode(stat),
     nlink: stat.nlink,
     user: Etc.getpwuid(stat.uid).name,
     group: Etc.getgrgid(stat.gid).name,
     size: stat.size,
-    datetime: time.strftime('%_m %_d %H:%M'),
+    datetime: stat.mtime.strftime('%_m %_d %H:%M'),
     file: entry,
     blocks: stat.blocks
   }
