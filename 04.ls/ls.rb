@@ -50,9 +50,9 @@ def print_entries(entries)
 end
 
 def create_table(entries)
-  row_num = (entries.size + COLUMN_COUNT - 1) / COLUMN_COUNT
-  Array.new(row_num) do |row_index|
-    Array.new(COLUMN_COUNT) { |col_index| entries[col_index * row_num + row_index] || '' }
+  row_count = (entries.size + COLUMN_COUNT - 1) / COLUMN_COUNT
+  Array.new(row_count) do |row_index|
+    Array.new(COLUMN_COUNT) { |col_index| entries[col_index * row_count + row_index] || '' }
   end
 end
 
