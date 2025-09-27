@@ -17,7 +17,7 @@ FILE_TYPES = {
 def main
   options = parse_options
   entries = list_entries(options)
-  options[:l] ? print_entries_l(entries) : print_entries(entries)
+  options[:l] ? print_entries_long_format(entries) : print_entries(entries)
 end
 
 def parse_options
@@ -60,7 +60,7 @@ def calc_tab_count(entry)
   entry.length / TAB_WIDTH
 end
 
-def print_entries_l(entries)
+def print_entries_long_format(entries)
   metadata_list = entries.map { |entry| extract_entry_metadata(entry) }
   puts "total #{metadata_list.sum { |metadata| metadata[:blocks] }}"
   formatted_metadata_list = format_metadata_list(metadata_list)
