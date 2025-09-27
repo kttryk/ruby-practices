@@ -62,9 +62,9 @@ end
 
 def print_entries_l(entries)
   metadata_list = entries.map { |entry| extract_entry_metadata(entry) }
-  formated_metadata_list = format_metadata_list(metadata_list)
+  formatted_metadata_list = format_metadata_list(metadata_list)
   puts "total #{metadata_list.sum { |metadata| metadata[:blocks] }}"
-  formated_metadata_list.each do |metadata|
+  formatted_metadata_list.each do |metadata|
     puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
   end
 end
