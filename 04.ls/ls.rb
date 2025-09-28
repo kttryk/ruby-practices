@@ -63,9 +63,8 @@ end
 def print_entries_in_long_format(entries)
   metadata_list = entries.map { |entry| extract_entry_metadata(entry) }
   puts "total #{metadata_list.sum { |metadata| metadata[:blocks] }}"
-  formatted_metadata_list = format_metadata_list(metadata_list)
-  formatted_metadata_list.each do |metadata|
-    puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
+  format_metadata_list(metadata_list) do |formatted_metadata|
+    puts formatted_metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
   end
 end
 
@@ -103,11 +102,12 @@ def format_metadata_list(metadata_list)
     [key, max_length]
   end
   metadata_list.map do |metadata|
-    metadata.to_h do |key, value|
+    formatted_metadata = metadata.to_h do |key, value|
       max_length = max_lengths[key] || 0
       width_format = value.is_a?(String) ? "%-#{max_length + 1}s" : "%#{max_length}d"
       [key, format(width_format, value)]
     end
+    yield formatted_metadata
   end
 end
 
