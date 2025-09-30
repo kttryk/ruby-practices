@@ -17,7 +17,7 @@ FILE_TYPES = {
 def main
   options = parse_options
   entries = list_entries(options)
-  options[:l] ? print_entries_l(entries) : print_entries(entries)
+  options[:l] ? print_entries_in_long_format(entries) : print_entries(entries)
 end
 
 def parse_options
@@ -50,9 +50,9 @@ def print_entries(entries)
 end
 
 def create_table(entries)
-  row_num = (entries.size + COLUMN_COUNT - 1) / COLUMN_COUNT
-  Array.new(row_num) do |row_index|
-    Array.new(COLUMN_COUNT) { |col_index| entries[col_index * row_num + row_index] || '' }
+  row_count = (entries.size + COLUMN_COUNT - 1) / COLUMN_COUNT
+  Array.new(row_count) do |row_index|
+    Array.new(COLUMN_COUNT) { |col_index| entries[col_index * row_count + row_index] || '' }
   end
 end
 
@@ -60,25 +60,23 @@ def calc_tab_count(entry)
   entry.length / TAB_WIDTH
 end
 
-def print_entries_l(entries)
-  entries_metadata = entries.map { |entry| extract_entry_metadata(entry) }
-  formated_entries_metadata = format_entries_metadata(entries_metadata, %i[nlink user group size])
-  puts "total #{entries_metadata.sum { |metadata| metadata[:blocks] }}"
-  formated_entries_metadata.each do |metadata|
-    puts metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
+def print_entries_in_long_format(entries)
+  metadata_list = entries.map { |entry| extract_entry_metadata(entry) }
+  puts "total #{metadata_list.sum { |metadata| metadata[:blocks] }}"
+  format_metadata_list(metadata_list) do |formatted_metadata|
+    puts formatted_metadata.values_at(:mode, :nlink, :user, :group, :size, :datetime, :file).join(' ')
   end
 end
 
 def extract_entry_metadata(entry)
   stat = File.stat(entry)
-  time = stat.mtime
   {
     mode: get_entry_mode(stat),
     nlink: stat.nlink,
     user: Etc.getpwuid(stat.uid).name,
     group: Etc.getgrgid(stat.gid).name,
     size: stat.size,
-    datetime: time.strftime('%_m %_d %H:%M'),
+    datetime: stat.mtime.strftime('%_m %_d %H:%M'),
     file: entry,
     blocks: stat.blocks
   }
@@ -98,17 +96,18 @@ def get_entry_mode(stat)
   [file_type, permission].join
 end
 
-def format_entries_metadata(entries_metadata, format_keys)
-  max_lengths = format_keys.to_h do |key|
-    max_length = entries_metadata.map { |metadata| metadata[key].to_s.length }.max
+def format_metadata_list(metadata_list)
+  max_lengths = %i[nlink user group size].to_h do |key|
+    max_length = metadata_list.map { |metadata| metadata[key].to_s.length }.max
     [key, max_length]
   end
-  entries_metadata.map do |metadata|
-    metadata.map do |key, value|
+  metadata_list.map do |metadata|
+    formatted_metadata = metadata.to_h do |key, value|
       max_length = max_lengths[key] || 0
       width_format = value.is_a?(String) ? "%-#{max_length + 1}s" : "%#{max_length}d"
       [key, format(width_format, value)]
-    end.to_h
+    end
+    yield formatted_metadata
   end
 end
 
